@@ -1,0 +1,14 @@
+[reproducibility]
+seeds = [17, 29, 43]
+
+[within_dataset]
+enabled = true
+split_unit = "subject"
+
+[leave_one_dataset_out]
+enabled = true
+datasets = ["bidmc", "wesad", "ptt_ppg", "ppg_dalia"]
+
+[pairwise_transfer]
+enabled = false
+

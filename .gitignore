@@ -1,0 +1,66 @@
+# Local environments and editor/OS files.
+.venv/
+.env
+.env.*
+!.env.example
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*~
+
+# Python build, cache and test output.
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+build/
+dist/
+
+# Datasets and derived arrays remain outside Git. They are transferred to the
+# GPU server separately and are not required to review the source code.
+data/
+datasets/
+artifacts/
+scratch/
+presentation/
+scripts/hpc/
+# Reports contain large per-window predictions, checkpoints, CSV manifests and
+# figures. Keep the written protocol/results narratives under version control.
+reports/**
+!reports/
+!reports/**/
+!reports/**/*.md
+
+# Generated presentation files; keep the scripts and teaching text in Git.
+presentation/output/
+
+# Office documents are local reference material, not source files.
+docs/*.docx
+docs/*.pptx
+docs/*.xlsx
+
+# Guard against accidentally adding data, weights, archives or logs elsewhere.
+*.npy
+*.npz
+*.pt
+*.pth
+*.ckpt
+*.pkl
+*.pickle
+*.h5
+*.hdf5
+*.mat
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.7z
+*.log
+*.out
+slurm-*.txt

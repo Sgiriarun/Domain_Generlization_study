@@ -1,0 +1,84 @@
+What your supervisor is telling you is: **don’t finalise the RQ1 gap from 2–3 papers yet. First prove, from the literature, exactly what has already been done and what still remains unresolved.**
+
+Right now, I would **stop changing RQ2** and do a focused literature review around RQ1 first.
+
+Your review should answer these five questions:
+
+1. **How much work already exists on cross-dataset PPG → HR estimation?**
+   Find papers that explicitly train on one/multiple datasets and test on a different dataset. BeliefPPG, SPEAR, etc. belong here.
+
+2. **What types of models have already been evaluated?**
+   Separate them into:
+
+   * classical/spectral HR estimation;
+   * supervised CNN/ResNet/LSTM;
+   * Transformer-type models;
+   * self-supervised learning;
+   * foundation models such as PaPaGei;
+   * domain adaptation/domain generalisation;
+   * uncertainty-aware methods such as BeliefPPG.
+
+3. **What datasets and domain shifts were actually tested?**
+   For every paper record:
+
+   * training dataset(s);
+   * test dataset(s);
+   * device/sensor;
+   * body site;
+   * population;
+   * activity/environment;
+   * whether the target dataset was truly unseen;
+   * whether target data were used for adaptation/fine-tuning.
+
+   This is critical because “cross-dataset”, “cross-device”, and “domain adaptation” are **not the same thing**.
+
+4. **How much performance degradation was reported?**
+   Extract actual numbers where possible:
+
+   * within-domain MAE;
+   * cross-domain MAE;
+   * generalisation gap;
+   * activity-specific errors;
+   * any RMSE/correlation/Bland–Altman results.
+
+   Then we can substantiate a statement such as:
+
+   > “Cross-dataset generalisation has been demonstrated, but performance degradation remains heterogeneous across datasets and acquisition conditions.”
+
+   with actual evidence rather than opinion.
+
+5. **What do recent SSL/foundation models already solve, and what remains?**
+   Specifically check whether:
+
+   * they improve unseen-dataset HR estimation;
+   * the target dataset appeared during pretraining;
+   * they were evaluated on genuinely unseen devices;
+   * they still show residual performance degradation;
+   * device/activity/population effects were separately characterised.
+
+### I suggest making one evidence table
+
+| Paper      | Year | HR task            | Model type       | Train datasets  | Unseen test dataset          | Target data used?             | Device/body site shift | Within MAE | Cross-domain MAE | Key finding               | Remaining limitation                              |
+| ---------- | ---: | ------------------ | ---------------- | --------------- | ---------------------------- | ----------------------------- | ---------------------- | ---------: | ---------------: | ------------------------- | ------------------------------------------------- |
+| BeliefPPG  | 2023 | PPG→HR             | Probabilistic DL | Multiple        | Leave-one-dataset-out        | No target training            | Mixed                  |          … |                … | Cross-dataset HR possible | SSL suggested; heterogeneous effects not isolated |
+| SPEAR      | 2024 | PPG→HR             | SSL denoising    | Stanford        | DaLiA                        | No DaLiA training             | Yes                    |          … |                … | SSL improves transfer     | Not broad multi-domain benchmark                  |
+| EnhancePPG | 2025 | PPG→HR             | SSL              | WESAD etc.      | DaLiA                        | **Yes, labelled fine-tuning** | Partial                |          … |                … | SSL improves HR           | Not zero-target DG                                |
+| PaPaGei    | 2025 | Multiple PPG tasks | Foundation model | Large-scale PPG | Multiple downstream datasets | Audit needed                  | Heterogeneous          |          … |                … | Strong representations    | Need true-unseen-domain audit                     |
+
+Once we have roughly **15–25 highly relevant papers**, not hundreds, we should be able to answer your supervisor properly.
+
+The output should then be three things:
+
+**A. Evidence-backed literature summary** — what the field has already accomplished.
+
+**B. Gap matrix** — what BeliefPPG, SSL, foundation models, DG/DA methods have *not* adequately addressed.
+
+**C. Revised RQ1** — only after the evidence supports it.
+
+For example, we should **not yet claim**:
+
+> “Device, acquisition, activity and population effects are not well characterised.”
+
+We currently *suspect* this is the gap. Your supervisor is correctly asking us to **prove it from substantial literature evidence first**.
+
+My recommendation is that our next task should be exactly this: **I do a proper targeted literature review of recent PPG-HR cross-domain generalisation work, probably 2019–2026 with emphasis on 2022–2026, and build the evidence table above. Then we can determine whether RQ1 is genuinely strong and what RQ2 should be.**

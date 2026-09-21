@@ -1,0 +1,21 @@
+# Presentation generation
+Pillow>=11.0,<13
+python-pptx>=1.0,<2
+
+# RQ1 dataset inspection, signal loading, and preprocessing
+h5py>=3.12,<4
+numpy>=2.0,<3
+pandas>=2.2,<4
+scipy>=1.14,<2
+scikit-learn>=1.6,<2
+wfdb>=4.2,<5
+matplotlib>=3.9,<4
+neurokit2>=0.2.13,<0.3
+sleepecg>=0.5.9,<0.6
+ts2vg>=1.2,<2
+
+# Test runner
+pytest>=8.3,<10
+
+# Phase 9 TimePPG reference implementation
+torch>=2.7,<3

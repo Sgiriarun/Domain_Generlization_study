@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rq1-ppg-domain-generalisation"
+version = "0.1.0"
+description = "Cross-dataset PPG heart-rate estimation benchmark"
+requires-python = ">=3.11"
+dependencies = [
+  "h5py>=3.12,<4",
+  "numpy>=2.0,<3",
+  "pandas>=2.2,<4",
+  "scipy>=1.14,<2",
+  "wfdb>=4.2,<5",
+  "matplotlib>=3.9,<4",
+  "neurokit2>=0.2.13,<0.3",
+  "sleepecg>=0.5.9,<0.6",
+  "ts2vg>=1.2,<2",
+]
+
+[project.optional-dependencies]
+presentation = ["Pillow>=11.0,<13", "python-pptx>=1.0,<2"]
+test = ["pytest>=8.3,<10", "pytest-cov>=6,<8"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"

@@ -1,0 +1,39 @@
+[identity]
+name = "timeppg_big_ppg_only"
+reference_doi = "10.1145/3487910"
+official_repository = "https://github.com/eml-eda/q-ppg"
+upstream_commit_policy = "record checked-out commit before every experiment"
+
+[input]
+channels = 1
+samples = 512
+sampling_hz = 64
+window_seconds = 8
+step_seconds = 2
+normalization = "per_window_zscore"
+
+[architecture]
+channel_widths = [32, 32, 63, 64, 64, 121, 122, 104, 76, 82, 61]
+dilations = [2, 2, 1, 4, 4, 8, 8]
+receptive_fields = [5, 5, 5, 9, 9, 17, 17]
+activation = "relu6"
+batch_normalization = true
+
+[training]
+loss = "log_cosh"
+optimizer = "adam"
+learning_rate = 0.001
+adam_beta1 = 0.9
+adam_beta2 = 0.999
+adam_epsilon = 1e-8
+batch_size = 128
+maximum_epochs = 200
+early_stopping_metric = "validation_loss"
+early_stopping_patience_epochs = 20
+seeds = [17, 29, 43]
+
+[rq1_constraints]
+use_accelerometer = false
+allow_target_fine_tuning = false
+fit_on_target_data = false
+split_unit = "subject"

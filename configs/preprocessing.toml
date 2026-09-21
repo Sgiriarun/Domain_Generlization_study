@@ -1,0 +1,19 @@
+[signals]
+ppg_target_hz = 64
+ppg_bandpass_low_hz = 0.5
+ppg_bandpass_high_hz = 4.0
+
+[windows]
+length_seconds = 8
+stride_seconds = 2
+
+[quality]
+min_hr_bpm = 35
+max_hr_bpm = 220
+max_missing_fraction = 0.0
+min_valid_rr = 4
+detector_disagreement_warning_bpm = 10
+
+# Phase 4 HR-label rules frozen after validation on PPG-DaLiA and PTT-PPG and
+# quality review on WESAD and BIDMC. Detector disagreement is a warning; it is
+# not an automatic exclusion because no detector is guaranteed to be correct.

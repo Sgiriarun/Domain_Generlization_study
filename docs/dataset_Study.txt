@@ -1,0 +1,848 @@
+# Comparison Notes: PPG Datasets for Heart Rate Estimation
+
+## Common goal
+
+எல்லா datasets-க்கும் நம்முடைய common task:
+
+```text
+PPG signal
+   ↓
+Model
+   ↓
+Heart Rate estimation
+```
+
+நம்முடைய standardized setup:
+
+```text
+Window length = 10 seconds
+Stride        = 1 second
+Output HR     = 1 Hz
+```
+
+அதாவது:
+
+```text
+10-second PPG input
+      ↓
+    Model
+      ↓
+10 HR values
+```
+
+---
+
+# 1. BIDMC
+
+## Dataset overview
+
+* 53 recordings
+* ஒவ்வொரு recording சுமார் 8 minutes
+* ICU / clinical environment
+* Main original purpose: respiration estimation from PPG
+
+## PPG input
+
+Signal:
+
+```text
+PLETH
+```
+
+Sampling rate:
+
+```text
+125 Hz
+```
+
+10-second window:
+
+```text
+10 × 125
+= 1250 samples
+```
+
+அதனால்:
+
+```text
+X.shape = (1250, 1)
+```
+
+## HR ground truth
+
+`Numerics.csv`-ல்:
+
+```text
+HR
+```
+
+கிடைக்கும்.
+
+Sampling rate:
+
+```text
+1 Hz
+```
+
+10 seconds:
+
+```text
+10 HR values
+```
+
+அதனால்:
+
+```text
+y.shape = (10,)
+```
+
+## Common model setup
+
+```text
+PLETH @125 Hz
+     ↓
+10 sec
+     ↓
+1250 samples
+     ↓
+X=(1250,1)
+     ↓
+MODEL
+     ↓
+10 HR predictions
+     ↓
+y=(10,)
+```
+
+## Main advantage
+
+* HR ground truth already available
+* Simple preprocessing
+* PPG + ECG + RESP synchronized
+
+## Main limitation
+
+* ICU patients
+* Not daily-life wearable data
+* Limited motion variation
+
+---
+
+# 2. WESAD
+
+## Dataset overview
+
+* 15 subjects
+* Laboratory stress experiment
+* Wrist + chest devices
+* Main original purpose: stress / affect detection
+
+## Devices
+
+### Wrist
+
+```text
+Empatica E4
+```
+
+Signals:
+
+```text
+BVP  → 64 Hz
+ACC  → 32 Hz
+EDA  → 4 Hz
+TEMP → 4 Hz
+```
+
+BVP is the PPG signal.
+
+### Chest
+
+```text
+RespiBAN
+```
+
+Signals include:
+
+```text
+ECG
+RESP
+EDA
+EMG
+TEMP
+ACC
+```
+
+Chest sampling:
+
+```text
+700 Hz
+```
+
+## PPG input
+
+```text
+BVP @64 Hz
+```
+
+10-second window:
+
+```text
+10 × 64
+= 640 samples
+```
+
+Therefore:
+
+```text
+X.shape = (640, 1)
+```
+
+## HR ground truth
+
+Direct HR @1 Hz is not the main provided target.
+
+Ground truth must be created from chest ECG:
+
+```text
+ECG @700 Hz
+    ↓
+Detect R-peaks
+    ↓
+RR intervals
+    ↓
+HR = 60 / RR
+    ↓
+Interpolate / resample to 1 Hz
+```
+
+10 seconds:
+
+```text
+10 HR values
+```
+
+Therefore:
+
+```text
+y.shape = (10,)
+```
+
+## Common model setup
+
+```text
+Wrist BVP @64 Hz
+      ↓
+10 sec
+      ↓
+640 samples
+      ↓
+X=(640,1)
+      ↓
+MODEL
+      ↓
+10 HR predictions
+      ↓
+y=(10,)
+      ↑
+Chest ECG-derived HR @1Hz
+```
+
+## Main advantage
+
+* Real wearable wrist PPG
+* ECG reference available
+* Accelerometer available
+* Useful for motion-aware HR estimation
+
+## Main limitation
+
+* Only 15 subjects
+* Original dataset is mainly stress detection
+* HR ground truth must be derived
+
+---
+
+# 3. Pulse Transit Time PPG Dataset
+
+## Dataset overview
+
+* 22 subjects
+* Sitting, walking, running
+* 66 recordings approximately
+* Multiple PPG wavelengths and sensor locations
+
+## PPG device
+
+```text
+MAX30101
+```
+
+## ECG device
+
+```text
+AD8232
+```
+
+ECG sampling:
+
+```text
+500 Hz
+```
+
+## PPG signals
+
+6 PPG channels:
+
+```text
+pleth_1
+pleth_2
+pleth_3
+pleth_4
+pleth_5
+pleth_6
+```
+
+They represent:
+
+```text
+2 finger locations
+×
+3 wavelengths
+```
+
+Sampling:
+
+```text
+500 Hz
+```
+
+## Single-channel PPG input
+
+10-second window:
+
+```text
+10 × 500
+= 5000 samples
+```
+
+Therefore:
+
+```text
+X.shape = (5000, 1)
+```
+
+If all six channels are used:
+
+```text
+X.shape = (5000, 6)
+```
+
+## HR ground truth
+
+ECG R-peaks are already annotated.
+
+Therefore:
+
+```text
+ECG R-peaks
+    ↓
+RR intervals
+    ↓
+HR
+    ↓
+Resample to 1 Hz
+```
+
+10 seconds:
+
+```text
+y.shape = (10,)
+```
+
+## Common model setup
+
+```text
+PPG @500 Hz
+     ↓
+10 sec
+     ↓
+5000 samples
+     ↓
+X=(5000,1)
+     ↓
+MODEL
+     ↓
+10 HR predictions
+     ↓
+y=(10,)
+     ↑
+ECG R-peak-derived HR
+```
+
+## Main advantage
+
+* Very high PPG sampling rate
+* ECG reference
+* R-peaks already annotated
+* Sitting/walking/running conditions
+* Accelerometer and gyroscope available
+* Six PPG channels available
+
+## Main limitation
+
+* Input size is much larger
+* Multiple PPG channels make preprocessing more complex
+* Smaller number of subjects than BIDMC
+
+---
+
+# 4. PPG-DaLiA
+
+## Dataset overview
+
+* 15 subjects
+* Around 36 hours total data
+* Daily-life activities
+* Designed specifically for wearable PPG HR estimation
+
+Activities include:
+
+```text
+Sitting
+Walking
+Cycling
+Stairs
+Driving
+Table soccer
+Lunch
+Working
+```
+
+## Wrist device
+
+```text
+Empatica E4
+```
+
+Signals:
+
+```text
+BVP → 64 Hz
+ACC → 32 Hz
+EDA → 4 Hz
+TEMP → 4 Hz
+```
+
+## Chest device
+
+```text
+RespiBAN
+```
+
+Chest ECG:
+
+```text
+700 Hz
+```
+
+## PPG input
+
+```text
+BVP @64 Hz
+```
+
+For our common 10-second window:
+
+```text
+10 × 64
+= 640 samples
+```
+
+Therefore:
+
+```text
+X.shape = (640, 1)
+```
+
+## Original PPG-DaLiA labels
+
+The original benchmark uses:
+
+```text
+8-second window
+2-second stride
+1 mean HR value
+```
+
+So original setup:
+
+```text
+X = (512,1)
+y = (1,)
+```
+
+because:
+
+```text
+8 × 64
+= 512 samples
+```
+
+## Our standardized setup
+
+For comparison with other datasets:
+
+```text
+10-second window
+1-second stride
+HR @1 Hz
+```
+
+Ground truth should be created from ECG R-peaks:
+
+```text
+ECG
+ ↓
+R-peaks
+ ↓
+RR intervals
+ ↓
+HR
+ ↓
+Resample to 1 Hz
+```
+
+Therefore:
+
+```text
+X.shape = (640,1)
+
+y.shape = (10,)
+```
+
+## Main advantage
+
+* Specifically suitable for wearable HR estimation
+* Daily-life activities
+* Strong motion artifacts
+* Wrist ACC available
+* ECG ground truth available
+
+## Main limitation
+
+* Only 15 subjects
+* Original labels are not 1-Hz
+* Custom HR target must be generated if using our standardized setup
+
+---
+
+# Final comparison table
+
+| Feature               | BIDMC                   | WESAD               | PTT-PPG           | PPG-DaLiA              |
+| --------------------- | ----------------------- | ------------------- | ----------------- | ---------------------- |
+| Subjects / recordings | 53 recordings           | 15 subjects         | 22 subjects       | 15 subjects            |
+| Environment           | ICU                     | Lab                 | Sit/walk/run      | Daily life             |
+| PPG name              | PLETH                   | BVP                 | pleth_1–6         | BVP                    |
+| PPG device            | Clinical monitor        | Empatica E4         | MAX30101          | Empatica E4            |
+| PPG sampling          | 125 Hz                  | 64 Hz               | 500 Hz            | 64 Hz                  |
+| ECG sampling          | 125 Hz                  | 700 Hz              | 500 Hz            | 700 Hz                 |
+| ECG device            | Clinical monitor        | RespiBAN            | AD8232            | RespiBAN               |
+| Direct HR available   | Yes                     | No                  | Start/end only    | Original window labels |
+| ECG R-peaks           | ECG available           | Need detection      | Already annotated | Available/derived      |
+| ACC available         | Limited/not main        | Yes                 | Yes               | Yes                    |
+| Motion conditions     | Low                     | Some                | Sit/walk/run      | Strong daily-life      |
+| Best use              | Clinical HR/respiration | Wearable multimodal | Motion/PTT/HR     | Wearable HR            |
+
+---
+
+# Our common 10-second window
+
+```text
+                         SAME TASK
+                  PPG → HR estimation
+                          │
+                  10-second window
+                   1-second stride
+                          │
+          ┌───────────────┼────────────────┐
+          │               │                │
+          ▼               ▼                ▼
+
+BIDMC
+PPG = 125 Hz
+10 × 125 = 1250
+
+X = (1250,1)
+y = (10,)
+
+
+WESAD
+PPG = 64 Hz
+10 × 64 = 640
+
+X = (640,1)
+y = (10,)
+
+
+PTT-PPG
+PPG = 500 Hz
+10 × 500 = 5000
+
+X = (5000,1)
+y = (10,)
+
+
+PPG-DaLiA
+PPG = 64 Hz
+10 × 64 = 640
+
+X = (640,1)
+y = (10,)
+```
+
+---
+
+# X comparison
+
+```text
+Dataset             One 10-sec X window
+
+BIDMC       →       (1250, 1)
+
+WESAD       →       (640, 1)
+
+PTT-PPG     →       (5000, 1)
+
+PPG-DaLiA   →       (640, 1)
+```
+
+Formula:
+
+```text
+X length
+=
+Window duration × PPG sampling frequency
+```
+
+Examples:
+
+```text
+BIDMC:
+10 × 125 = 1250
+
+WESAD:
+10 × 64 = 640
+
+PTT:
+10 × 500 = 5000
+
+DaLiA:
+10 × 64 = 640
+```
+
+---
+
+# y comparison
+
+For our standardized experiment:
+
+```text
+Output frequency = 1 Hz
+Window = 10 sec
+```
+
+Therefore:
+
+```text
+10 × 1
+= 10 HR values
+```
+
+For ALL datasets:
+
+```text
+y.shape = (10,)
+```
+
+So:
+
+```text
+BIDMC      y=(10,)
+WESAD      y=(10,)
+PTT-PPG    y=(10,)
+PPG-DaLiA  y=(10,)
+```
+
+---
+
+# Ground truth comparison
+
+```text
+BIDMC
+─────
+Numerics.csv HR @1Hz
+        ↓
+Direct y
+
+
+WESAD
+─────
+Chest ECG @700Hz
+        ↓
+R-peaks
+        ↓
+RR interval
+        ↓
+HR
+        ↓
+1Hz y
+
+
+PTT-PPG
+───────
+ECG @500Hz
+        ↓
+Provided R-peaks
+        ↓
+RR interval
+        ↓
+HR
+        ↓
+1Hz y
+
+
+PPG-DaLiA
+─────────
+Chest ECG @700Hz
+        ↓
+R-peaks
+        ↓
+RR interval
+        ↓
+HR
+        ↓
+1Hz y
+```
+
+---
+
+# Most important point
+
+The four datasets have different PPG sampling rates:
+
+```text
+64 Hz
+125 Hz
+500 Hz
+```
+
+Therefore X is different.
+
+But we intentionally convert all ground-truth HR to:
+
+```text
+1 Hz
+```
+
+Therefore y becomes identical:
+
+```text
+10-second window
+        ↓
+10 HR values
+```
+
+So:
+
+```text
+                X                   y
+
+BIDMC       (1250,1)   ───────►   (10,)
+
+WESAD        (640,1)   ───────►   (10,)
+
+PTT-PPG     (5000,1)   ───────►   (10,)
+
+PPG-DaLiA    (640,1)   ───────►   (10,)
+```
+
+---
+
+# Important issue if training ONE model on all datasets
+
+Currently X sizes are different:
+
+```text
+1250
+640
+5000
+640
+```
+
+So they cannot simply be combined into one NumPy array and passed to the same fixed-input model.
+
+For one common model, a useful next step is to resample every PPG signal to one common sampling frequency.
+
+For example:
+
+```text
+Common PPG frequency = 64 Hz
+```
+
+Then:
+
+```text
+BIDMC
+125 Hz → 64 Hz
+
+WESAD
+64 Hz → 64 Hz
+
+PTT-PPG
+500 Hz → 64 Hz
+
+PPG-DaLiA
+64 Hz → 64 Hz
+```
+
+Now every 10-second input becomes:
+
+```text
+10 × 64
+= 640 samples
+```
+
+Therefore:
+
+```text
+BIDMC      X=(640,1)
+WESAD      X=(640,1)
+PTT-PPG    X=(640,1)
+PPG-DaLiA  X=(640,1)
+
+ALL:
+y=(10,)
+```
+
+Now all four datasets have exactly the same model input/output shape:
+
+```text
+                     ALL DATASETS
+
+              10 sec PPG @64 Hz
+                       │
+                       ▼
+                  X=(640,1)
+                       │
+                       ▼
+                     MODEL
+                       │
+                       ▼
+                  y=(10,)
+                       │
+                       ▼
+                   HR @1Hz
+```
+
+This is the cleanest standardized representation if the final goal is to train or compare one common PPG-to-HR model across all four datasets.
