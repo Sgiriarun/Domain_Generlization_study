@@ -9,11 +9,14 @@ WESAD, PTT-PPG and PPG-DaLiA, with ECG-derived heart rate as the reference.
 
 **Open [the step-by-step guide](start_here/README.md).** It explains the software
 setup, what each Python file does, the files it needs, and where results are saved.
+## Overview of complete Experiments carried 
+[Overview of the existing work done and its findings] 
+(docs/PPG Heart-Rate Estimation Experimental Overview.png)
 
+## Overview of complete Research
 
-## To understand the complete flow
+![Overview of completed experiments and findings](docs/PPG%20Heart-Rate%20Estimation%20Experimental%20Overview.png)
 
-![Overview of the existing research code and its connections](docs/diagram.png)
 
 [Open the diagram at full size](docs/diagram.png).
 
