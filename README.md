@@ -17,8 +17,11 @@ setup, what each Python file does, the files it needs, and where results are sav
 
 ![Overview of completed experiments and findings](docs/PPG%20Heart-Rate%20Estimation%20Experimental%20Overview.png)
 
+## Complete Research Workflow
 
-[Open the diagram at full size](docs/diagram.png).
+The following diagram illustrates how the research code, datasets, models, experiments, and results are connected.
+
+![Overview of the existing research code and its connections](docs/diagram.png)
 
 
 The diagram shows connections between parts of the code, not an exact command
