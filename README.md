@@ -1,13 +1,35 @@
-# Cross-domain PPG heart-rate estimation
+# Estimating heart rate from PPG across different recording conditions
 
-This repository implements RQ1 as a reproducible benchmarking and failure-
-characterisation study across BIDMC, WESAD, Pulse Transit Time PPG, and
-PPG-DaLiA.
 
-The raw datasets live in `datasets/raw/`. Reusable research code belongs in
-`src/rq1_hr/`; executable workflow entry points belong in `scripts/`; generated
-results belong in `artifacts/` and `reports/`.
+This project estimates heart rate from contact PPG (an optical pulse signal) and
+investigates why prediction errors change between recordings. We use BIDMC,
+WESAD, PTT-PPG and PPG-DaLiA, with ECG-derived heart rate as the reference.
 
-See [`docs/project_plan.md`](docs/project_plan.md) for the ordered workflow and
-completion criteria.
+## Start here
 
+**Open [the step-by-step guide](start_here/README.md).** It explains the software
+setup, what each Python file does, the files it needs, and where results are saved.
+
+
+## To understand the complete flow
+
+![Overview of the existing research code and its connections](docs/diagram.png)
+
+[Open the diagram at full size](docs/diagram.png).
+
+
+The diagram shows connections between parts of the code, not an exact command
+order. Its technical labels are explained in ordinary English in the
+[numbered guide](start_here/README.md#the-work-in-order).
+
+## Where things are kept
+
+| Folder | What it contains |
+|---|---|
+| `scripts/` | Files that run preparation, experiments and analysis |
+| `src/rq1_hr/` | Shared calculations, signal readers and model code used by those files |
+| `datasets/raw/` | Original recordings; obtain separately under the dataset terms |
+| `reports/` | Existing research results, tables and figures; preserve these |
+| `artifacts/` | Model files and supporting saved files, where present |
+| `study_results/` | Destination for new runs where output redirection is supported |
+| `tests/` | Automated implementation checks |

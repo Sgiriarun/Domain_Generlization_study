@@ -28,7 +28,8 @@ data/
 datasets/
 artifacts/
 scratch/
-presentation/
+study_results/
+
 scripts/hpc/
 # Reports contain large per-window predictions, checkpoints, CSV manifests and
 # figures. Keep the written protocol/results narratives under version control.
@@ -44,6 +45,9 @@ presentation/output/
 docs/*.docx
 docs/*.pptx
 docs/*.xlsx
+
+# Copyrighted literature full texts are stored locally and never committed.
+literature/full_text/**/*.pdf
 
 # Guard against accidentally adding data, weights, archives or logs elsewhere.
 *.npy

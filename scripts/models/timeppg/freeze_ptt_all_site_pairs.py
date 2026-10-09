@@ -32,6 +32,50 @@ PAIRS = {
 }
 
 
+def plot_summary(summary: pd.DataFrame, figures: Path) -> None:
+    """Plot the frozen paired-channel result using committee-friendly labels."""
+    fig, ax = plt.subplots(figsize=(11.5, 6.8))
+    x = np.arange(len(summary))
+    means = summary.subject_macro_proximal_penalty_bpm.to_numpy()
+    errors = np.vstack([means - summary.ci_low_bpm, summary.ci_high_bpm - means])
+    # Numerical labels avoid the conflicting red/infrared channel assignments
+    # in the dataset documentation. Colour carries no wavelength meaning.
+    ax.bar(x, means, color="#347FA8", width=.58)
+    ax.errorbar(x, means, yerr=errors, fmt="none", ecolor="#132A3A", capsize=5, linewidth=1.5)
+    ax.axhline(0, color="#132A3A", linewidth=.9)
+    pair_labels = {
+        "pair_1_4": "Channel pair 1–4\nFingertip Ch 1 ↔ Finger base Ch 4",
+        "pair_2_5": "Channel pair 2–5\nFingertip Ch 2 ↔ Finger base Ch 5",
+        "pair_3_6": "Channel pair 3–6\nFingertip Ch 3 ↔ Finger base Ch 6",
+    }
+    ax.set_xticks(x, [pair_labels[value] for value in summary.pair])
+    ax.set_xlabel("Synchronised fingertip–finger-base channel comparison", labelpad=10)
+    ax.set_ylabel("Extra HR error with finger-base input (bpm)\nPositive values = higher error with finger-base input")
+    ax.set_title(
+        "Higher HR error with finger-base PPG input\n"
+        "Matched recordings from the same participants, times and reference HR",
+        pad=12,
+    )
+    ax.grid(axis="y", alpha=.2)
+    for index, row in summary.iterrows():
+        ax.text(
+            index,
+            row.subject_macro_proximal_penalty_bpm + .18,
+            f"{row.subject_macro_proximal_penalty_bpm:+.2f} bpm more error\n"
+            f"Higher error for {int(row.subjects_positive)} of 22 participants",
+            ha="center",
+            va="bottom",
+            fontweight="bold",
+        )
+    fig.text(.5, .02,
+             "Bars: participant-average MAE difference, averaged across both training directions.\n"
+             "Error bars: 95% participant-bootstrap intervals. Channel numbers do not assign wavelengths.",
+             ha="center", fontsize=9)
+    fig.tight_layout(rect=(0, .09, 1, 1))
+    fig.savefig(figures / "all_pair_proximal_penalty.png", dpi=220)
+    plt.close(fig)
+
+
 def model_root(channel: str) -> Path:
     if channel == "pleth_1":
         return Path("reports/phase9_timeppg/within_dataset_3fold/ptt_ppg")
@@ -67,9 +111,17 @@ def bootstrap(values: np.ndarray, seed: int, draws: int = 20_000) -> tuple[float
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--seed", type=int, default=17)
+    parser.add_argument(
+        "--plot-only",
+        action="store_true",
+        help="Regenerate the figure from the already frozen summary without rerunning inference.",
+    )
     args = parser.parse_args()
     OUT.mkdir(parents=True, exist_ok=True)
     figures = OUT / "figures"; figures.mkdir(exist_ok=True)
+    if args.plot_only:
+        plot_summary(pd.read_csv(OUT / "frozen_all_pair_summary.csv"), figures)
+        return
     # Do not spend time evaluating a partial experiment or write a misleading
     # partial freeze. Every pair, direction and fold must exist first.
     missing = []
@@ -170,22 +222,7 @@ def main() -> None:
     summary = pd.DataFrame(summaries)
     summary.to_csv(OUT / "frozen_all_pair_summary.csv", index=False)
 
-    fig, ax = plt.subplots(figsize=(9, 5.2))
-    x = np.arange(len(summary)); means = summary.subject_macro_proximal_penalty_bpm.to_numpy()
-    errors = np.vstack([means-summary.ci_low_bpm, summary.ci_high_bpm-means])
-    colors = np.where(means >= 0, "#E76F51", "#2A9D8F")
-    ax.bar(x, means, color=colors, width=.58)
-    ax.errorbar(x, means, yerr=errors, fmt="none", ecolor="#132A3A", capsize=5, linewidth=1.5)
-    ax.axhline(0, color="#132A3A", linewidth=.9)
-    ax.set_xticks(x, [value.replace("pair_", "Pair ").replace("_", "/") for value in summary.pair])
-    ax.set_ylabel("Proximal MAE − distal MAE (bpm)")
-    ax.set_title("Does the proximal-input disadvantage repeat across PTT channel pairs?")
-    ax.grid(axis="y", alpha=.2)
-    for index, row in summary.iterrows():
-        ax.text(index, row.subject_macro_proximal_penalty_bpm + .18,
-                f"{row.subject_macro_proximal_penalty_bpm:+.2f} bpm\n{int(row.subjects_positive)}/22 subjects",
-                ha="center", va="bottom", fontweight="bold")
-    fig.tight_layout(); fig.savefig(figures / "all_pair_proximal_penalty.png", dpi=220); plt.close(fig)
+    plot_summary(summary, figures)
 
     frozen = {
         "status": "frozen", "seed": args.seed,

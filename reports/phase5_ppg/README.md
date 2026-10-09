@@ -11,42 +11,6 @@
 
 The 0.5–4 Hz band corresponds approximately to 30–240 beats/min and surrounds the frozen 35–220 bpm HR range. Filtering the complete recording, rather than each window separately, reduces artificial boundary effects. No amplitude normalization is applied here because amplitude/device differences are part of the distribution-shift question; model-time normalization can be evaluated later as an explicit experiment.
 
-## Why 0.5–4 Hz?
-
-Frequency in hertz converts to heart rate by `bpm = Hz × 60`; therefore,
-0.5–4 Hz represents approximately 30–240 bpm. This covers the project's accepted
-35–220 bpm reference range with a small margin. The high-pass edge reduces the
-DC component and slow baseline drift, while the low-pass edge reduces faster
-noise outside the main pulse-rate band.
-
-Band-pass filtering is common in PPG heart-rate work, but **0.5–4 Hz is not a
-universal standard**. Published examples use nearby bands such as 0.4–5 Hz,
-0.5–2.5 Hz, and 0.5–5 Hz depending on the population, sensor, task, and whether
-waveform morphology must be preserved. A dual-wavelength PPG HR study also
-searched for HR-related spectral components specifically within 0.5–4 Hz.
-
-Our exact band was specified in the supervisor's common pipeline and is
-physiologically consistent with our declared HR range. It is applied unchanged
-to all datasets, preventing dataset-specific filter tuning from giving one
-domain an unfair advantage.
-
-Limitations: filtering cannot remove motion artifacts whose frequencies overlap
-the cardiac band, and the 4 Hz upper edge suppresses higher-frequency waveform
-morphology. It is suitable for the primary HR-estimation task, but should not be
-assumed suitable for morphology, vascular-age, or detailed fiducial analysis.
-
-Supporting literature:
-
-- Charlton et al. describe band-pass filtering as common for baseline removal
-  and report a 0.4–5 Hz example in wearable PPG HR processing:
-  https://www.mdpi.com/2076-3417/14/17/7451
-- Chen et al. use a 0.5–5 Hz passband for PPG peak/HR estimation:
-  https://pmc.ncbi.nlm.nih.gov/articles/PMC8869811/
-- Casson et al. use 0.5–4 Hz as the HR spectral search range in a PPG HR method:
-  https://www.mdpi.com/1424-8220/22/24/9955
-- Zieliński et al. use a fourth-order 0.5–2.5 Hz band-pass for wearable PPG HR:
-  https://www.mdpi.com/1424-8220/20/6/1783
-
 ## Structural results
 
 | dataset | records | subjects | window_channels | structurally_usable | median_std | median_flat_fraction | median_spectral_concentration |
